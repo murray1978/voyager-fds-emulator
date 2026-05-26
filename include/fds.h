@@ -21,6 +21,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>   /* size_t - not pulled in transitively on Linux gcc */
 
 /* ============================================================================
  * PROCESSOR CONSTANTS

@@ -1388,18 +1388,23 @@ RESULT: DW   $0000`,
 
             banking: `; Memory banking demonstration
 ; Upper bank starts at $1000
+;
+; IMPORTANT: SETAU re-banks ALL absolute data addresses, including the
+; low addresses where VALUE/VALUE2 are stored. So a constant must be
+; loaded into RA *before* switching banks, then written after. Loading
+; VALUE2 while addressUpper is set would read $100D (empty) instead.
 
         ORG  $000
 
-        ; Store in lower bank
+        ; Store $AAAA in lower bank
         MLD  VALUE
         MRD  $100       ; Store at $100 (lower)
 
-        ; Switch to upper bank
-        SETAU
+        ; Load $5555 while still in the lower bank...
+        MLD  VALUE2     ; RA <- $5555
 
-        ; Store different value in upper bank
-        MLD  VALUE2
+        ; ...then switch up and store it in the upper bank
+        SETAU
         MRD  $100       ; Store at $1100 (upper)
 
         ; Switch back to lower
@@ -1414,6 +1419,7 @@ RESULT: DW   $0000`,
         MLD  $100       ; Should be $5555
         OUT
 
+        SETAD           ; Back to lower bank before halt
         WAT  $FFF
 
 VALUE:  DW   $AAAA
